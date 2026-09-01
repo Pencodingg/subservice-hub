@@ -16,29 +16,47 @@ export type Database = {
     Tables: {
       records: {
         Row: {
+          city: string | null
           created_at: string
+          freq: number | null
           id: string
           item_name: string
           last_updated: string
           main_service: string
+          no_simf: string | null
+          province: string | null
+          site_id: string | null
+          station_name: string | null
           status: string
           subservice: string
         }
         Insert: {
+          city?: string | null
           created_at?: string
+          freq?: number | null
           id?: string
           item_name: string
           last_updated?: string
           main_service: string
+          no_simf?: string | null
+          province?: string | null
+          site_id?: string | null
+          station_name?: string | null
           status?: string
           subservice: string
         }
         Update: {
+          city?: string | null
           created_at?: string
+          freq?: number | null
           id?: string
           item_name?: string
           last_updated?: string
           main_service?: string
+          no_simf?: string | null
+          province?: string | null
+          site_id?: string | null
+          station_name?: string | null
           status?: string
           subservice?: string
         }
