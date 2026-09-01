@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { RecordInput, ServiceRecord } from "@/lib/records";
+import { STATUSES, type RecordInput, type ServiceRecord } from "@/lib/records";
 
 type Props = {
   open: boolean;
@@ -29,13 +29,27 @@ type Props = {
   onSubmit: (input: RecordInput) => void;
 };
 
-const MAIN_SERVICES = ["Connectivity", "Cloud Platform", "Managed Security", "Data Center"];
+const MAIN_SERVICES = [
+  "Fixed Service",
+  "Land Mobile (private)",
+  "Land Mobile (public)",
+  "Broadcast",
+  "Maritime",
+  "Aeronautical",
+  "Other Services",
+];
 
 const EMPTY: RecordInput = {
   item_name: "",
-  main_service: "Connectivity",
+  main_service: "Fixed Service",
   subservice: "",
-  status: "Active",
+  status: "Granted",
+  no_simf: "",
+  site_id: "",
+  station_name: "",
+  freq: null,
+  city: "",
+  province: "",
 };
 
 export function RecordFormDialog({
@@ -47,50 +61,75 @@ export function RecordFormDialog({
   onSubmit,
 }: Props) {
   const [form, setForm] = useState<RecordInput>(EMPTY);
+  const [freqText, setFreqText] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setError(null);
-    setForm(
-      record
-        ? {
-            item_name: record.item_name,
-            main_service: record.main_service,
-            subservice: record.subservice,
-            status: record.status,
-          }
-        : { ...EMPTY, subservice: subservices[0] ?? "" },
-    );
+    if (record) {
+      setForm({
+        item_name: record.item_name,
+        main_service: record.main_service,
+        subservice: record.subservice,
+        status: record.status,
+        no_simf: record.no_simf ?? "",
+        site_id: record.site_id ?? "",
+        station_name: record.station_name ?? "",
+        freq: record.freq,
+        city: record.city ?? "",
+        province: record.province ?? "",
+      });
+      setFreqText(record.freq === null ? "" : String(record.freq));
+    } else {
+      setForm({ ...EMPTY, subservice: subservices[0] ?? "" });
+      setFreqText("");
+    }
   }, [open, record, subservices]);
 
   const submit = () => {
-    if (!form.item_name.trim()) return setError("Item name is required.");
+    if (!form.item_name.trim()) return setError("Client name is required.");
     if (!form.subservice.trim()) return setError("Subservice is required.");
+    const freq = freqText.trim() === "" ? null : Number(freqText);
+    if (freq !== null && Number.isNaN(freq)) return setError("Frequency must be a number.");
     setError(null);
-    onSubmit({ ...form, item_name: form.item_name.trim(), subservice: form.subservice.trim() });
+    const clean = (v: string | null) => {
+      const t = (v ?? "").trim();
+      return t === "" ? null : t;
+    };
+    onSubmit({
+      ...form,
+      item_name: form.item_name.trim(),
+      subservice: form.subservice.trim(),
+      no_simf: clean(form.no_simf),
+      site_id: clean(form.site_id),
+      station_name: clean(form.station_name),
+      city: clean(form.city),
+      province: clean(form.province),
+      freq,
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{record ? "Edit record" : "Add record"}</DialogTitle>
           <DialogDescription>
             {record
-              ? "Update the details of this record. Changes save instantly."
-              : "Create a new record in the dataset."}
+              ? "Update the details of this licence record."
+              : "Create a new licence record in the dataset."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
           <div className="grid gap-2">
-            <Label htmlFor="item_name">Item name</Label>
+            <Label htmlFor="item_name">Client name</Label>
             <Input
               id="item_name"
               value={form.item_name}
               onChange={(e) => setForm((f) => ({ ...f, item_name: e.target.value }))}
-              placeholder="e.g. Fiber Link 01234"
+              placeholder="e.g. INDOSAT TBK, PT."
             />
           </div>
 
@@ -131,20 +170,80 @@ export function RecordFormDialog({
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label>Status</Label>
-            <Select
-              value={form.status}
-              onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}
-            >
-              <SelectTrigger className="sm:w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="no_simf">Licence no. (NO_SIMF)</Label>
+              <Input
+                id="no_simf"
+                value={form.no_simf ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, no_simf: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="site_id">Site ID</Label>
+              <Input
+                id="site_id"
+                value={form.site_id ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, site_id: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="station_name">Station name</Label>
+              <Input
+                id="station_name"
+                value={form.station_name ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, station_name: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="freq">Frequency (MHz)</Label>
+              <Input
+                id="freq"
+                inputMode="decimal"
+                value={freqText}
+                onChange={(e) => setFreqText(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-2">
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
+                value={form.city ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="province">Province</Label>
+              <Input
+                id="province"
+                value={form.province ?? ""}
+                onChange={(e) => setForm((f) => ({ ...f, province: e.target.value }))}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Status</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm((f) => ({ ...f, status: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
