@@ -1,0 +1,1 @@
+DELETE FROM public.records WHERE item_name = '(tanpa nama)';
