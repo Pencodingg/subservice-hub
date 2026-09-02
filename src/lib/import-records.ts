@@ -3,13 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 import type { RecordInput } from "@/lib/records";
 
 const ALIASES: Record<keyof RecordInput, string[]> = {
-  item_name: ["item_name", "item name", "nama", "client", "klien", "nama klien", "name"],
+  item_name: [
+    "item_name",
+    "item name",
+    "clnt_name",
+    "clnt name",
+    "client_name",
+    "nama",
+    "client",
+    "klien",
+    "nama klien",
+    "name",
+  ],
   main_service: ["main_service", "main service", "service", "layanan", "service utama"],
   subservice: ["subservice", "sub service", "sub_service", "sub layanan", "subservis"],
-  status: ["status", "status izin"],
+  status: ["status", "status_simf", "status simf", "status izin"],
   no_simf: ["no_simf", "no simf", "no izin", "no_izin", "nomor izin", "izin"],
   site_id: ["site_id", "site id", "siteid", "id site"],
-  station_name: ["station_name", "station name", "nama stasiun", "stasiun"],
+  station_name: ["station_name", "station name", "stn_name", "stn name", "nama stasiun", "stasiun"],
   freq: ["freq", "frequency", "frekuensi", "freq (mhz)", "frekuensi (mhz)"],
   city: ["city", "kota", "kabupaten", "kota/kabupaten"],
   province: ["province", "provinsi", "prov"],
