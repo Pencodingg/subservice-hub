@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Search,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -47,6 +48,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { RecordFormDialog } from "@/components/records/RecordFormDialog";
+import { ImportDialog } from "@/components/records/ImportDialog";
 import {
   createRecord,
   deleteRecord,
@@ -101,6 +103,7 @@ function Dashboard() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<ServiceRecord | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ServiceRecord | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(search), 300);
@@ -191,6 +194,9 @@ function Dashboard() {
               onClick={() => invalidate()}
             >
               <RefreshCw className={recordsQuery.isFetching ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+            </Button>
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
+              <Upload className="h-4 w-4" /> Impor Excel/CSV
             </Button>
             <Button
               onClick={() => {
@@ -401,6 +407,8 @@ function Dashboard() {
           </div>
         </section>
       </main>
+
+      <ImportDialog open={importOpen} onOpenChange={setImportOpen} onImported={invalidate} />
 
       <RecordFormDialog
         open={formOpen}
