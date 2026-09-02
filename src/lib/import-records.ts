@@ -102,7 +102,10 @@ export async function insertRecordsBatched(
   let done = 0;
   for (let i = 0; i < rows.length; i += size) {
     const chunk = rows.slice(i, i + size);
-    const { error } = await supabase.from("records").insert(chunk);
+    // Data yang identik tidak diduplikasi — baris lama diperbarui (upsert).
+    const { error } = await supabase
+      .from("records")
+      .upsert(chunk, { onConflict: "dedupe_key", ignoreDuplicates: false });
     if (error) throw error;
     done += chunk.length;
     onProgress?.(done, rows.length);
