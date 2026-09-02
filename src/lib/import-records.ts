@@ -43,12 +43,14 @@ const text = (v: unknown) => {
 export async function parseImportFile(file: File): Promise<ParsedImport> {
   const buf = await file.arrayBuffer();
   const wb = XLSX.read(buf, { type: "array" });
-  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const sheetName = wb.SheetNames[0];
+  const sheet = sheetName ? wb.Sheets[sheetName] : undefined;
   if (!sheet) throw new Error("File tidak memiliki sheet data.");
   const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null });
-  if (raw.length === 0) throw new Error("File tidak berisi baris data.");
+  const first = raw[0];
+  if (!first) throw new Error("File tidak berisi baris data.");
 
-  const headers = Object.keys(raw[0]);
+  const headers = Object.keys(first);
   const map = buildMap(headers);
   if (!map.item_name && !map.subservice) {
     throw new Error(
