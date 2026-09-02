@@ -94,10 +94,30 @@ export async function parseImportFile(file: File): Promise<ParsedImport> {
   };
 }
 
+const keyOf = (r: RecordInput) =>
+  [
+    r.item_name,
+    r.main_service,
+    r.subservice,
+    r.no_simf,
+    r.site_id,
+    r.station_name,
+    r.freq,
+    r.city,
+    r.province,
+  ]
+    .map((v) => (v === null || v === undefined ? "" : String(v)))
+    .join("|")
+    .toLowerCase();
+
 export async function insertRecordsBatched(
-  rows: RecordInput[],
+  allRows: RecordInput[],
   onProgress?: (done: number, total: number) => void,
 ) {
+  // Hilangkan duplikat di dalam file itu sendiri (baris terakhir menang).
+  const map = new Map<string, RecordInput>();
+  for (const r of allRows) map.set(keyOf(r), r);
+  const rows = [...map.values()];
   const size = 500;
   let done = 0;
   for (let i = 0; i < rows.length; i += size) {
