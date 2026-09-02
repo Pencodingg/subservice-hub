@@ -12,4 +12,11 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    optimizeDeps: {
+      // Pre-bundle xlsx up front so opening the import dialog can't trigger a
+      // mid-session dep re-optimization (which reloads React and breaks hooks).
+      include: ["xlsx"],
+    },
+  },
 });
