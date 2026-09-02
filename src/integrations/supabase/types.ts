@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string
+          dedupe_key: string | null
           freq: number | null
           id: string
           item_name: string
@@ -33,6 +34,7 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string
+          dedupe_key?: string | null
           freq?: number | null
           id?: string
           item_name: string
@@ -48,6 +50,7 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string
+          dedupe_key?: string | null
           freq?: number | null
           id?: string
           item_name?: string
