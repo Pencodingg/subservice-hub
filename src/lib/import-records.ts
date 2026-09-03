@@ -63,9 +63,9 @@ export async function parseImportFile(file: File): Promise<ParsedImport> {
 
   const headers = Object.keys(first);
   const map = buildMap(headers);
-  if (!map.item_name && !map.subservice) {
+  if (!map.item_name) {
     throw new Error(
-      "Kolom tidak dikenali. Pastikan ada kolom seperti: item_name / klien, main_service, subservice, status.",
+      "Kolom nama klien tidak ditemukan. Pastikan file punya kolom seperti CLNT_NAME / item_name / klien.",
     );
   }
 
@@ -75,14 +75,14 @@ export async function parseImportFile(file: File): Promise<ParsedImport> {
     const get = (k: keyof RecordInput) => (map[k] ? r[map[k]!] : null);
     const item_name = text(get("item_name"));
     const subservice = text(get("subservice"));
-    if (!item_name && !subservice) {
+    if (!item_name) {
       skipped++;
       continue;
     }
     const freqRaw = text(get("freq"));
     const freqNum = freqRaw === null ? null : Number(freqRaw.replace(/,/g, "."));
     rows.push({
-      item_name: item_name ?? "(tanpa nama)",
+      item_name,
       main_service: text(get("main_service")) ?? "-",
       subservice: subservice ?? "-",
       status: text(get("status")) ?? "Granted",
