@@ -118,7 +118,8 @@ export function ImportDialog({ open, onOpenChange, onImported }: Props) {
               <p className="font-medium">{parsed.fileName}</p>
               <p className="text-muted-foreground">
                 {parsed.rows.length.toLocaleString()} baris siap diimpor
-                {parsed.skipped > 0 && ` · ${parsed.skipped} baris kosong dilewati`}
+                {parsed.skipped > 0 &&
+                  ` · ${parsed.skipped} baris tanpa nama klien dilewati`}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {parsed.matched.map((c) => (
