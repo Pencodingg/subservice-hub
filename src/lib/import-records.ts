@@ -105,6 +105,9 @@ export async function parseImportFile(file: File): Promise<ParsedImport> {
   };
 }
 
+const normalizeKeyPart = (value: string | number | null | undefined) =>
+  value === null || value === undefined ? "" : String(value).trim().toLowerCase();
+
 const keyOf = (r: RecordInput) =>
   [
     r.item_name,
@@ -117,9 +120,8 @@ const keyOf = (r: RecordInput) =>
     r.city,
     r.province,
   ]
-    .map((v) => (v === null || v === undefined ? "" : String(v)))
-    .join("|")
-    .toLowerCase();
+    .map(normalizeKeyPart)
+    .join("|");
 
 export async function insertRecordsBatched(
   allRows: RecordInput[],
