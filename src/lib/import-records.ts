@@ -21,9 +21,34 @@ const ALIASES: Record<keyof RecordInput, string[]> = {
   no_simf: ["no_simf", "no simf", "no izin", "no_izin", "nomor izin", "izin"],
   site_id: ["site_id", "site id", "siteid", "id site"],
   station_name: ["station_name", "station name", "stn_name", "stn name", "nama stasiun", "stasiun"],
+  station_address: [
+    "station_address",
+    "stn_addr",
+    "stn addr",
+    "alamat stasiun",
+    "alamat",
+    "address",
+  ],
+  callsign: ["callsign", "call_sign", "call sign", "tanda panggil"],
   freq: ["freq", "frequency", "frekuensi", "freq (mhz)", "frekuensi (mhz)"],
+  freq_pair: ["freq_pair", "freq pair", "frekuensi pasangan", "pasangan frekuensi"],
+  bandwidth: ["bandwidth", "bwidth", "bw", "lebar pita"],
+  antenna_height: ["antenna_height", "hgt_ant", "ant_height", "tinggi antena", "hgt ant"],
+  azimuth: ["azimuth", "azim", "azimut"],
+  latitude: ["latitude", "sid_lat", "lat", "lintang"],
+  longitude: ["longitude", "sid_long", "long", "lon", "bujur"],
+  village: ["village", "desa", "kelurahan"],
+  district: ["district", "kecamatan"],
   city: ["city", "kota", "kabupaten", "kota/kabupaten"],
   province: ["province", "provinsi", "prov"],
+  licence_date: ["licence_date", "license_date", "licence date", "tanggal izin", "tgl izin"],
+  validity_date: [
+    "validity_date",
+    "validity date",
+    "masa berlaku",
+    "tanggal berlaku",
+    "berlaku sampai",
+  ],
 };
 
 const norm = (s: string) => s.toString().trim().toLowerCase().replace(/\s+/g, " ");
@@ -47,13 +72,29 @@ export type ParsedImport = {
 
 const text = (v: unknown) => {
   if (v === null || v === undefined) return null;
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
   const s = String(v).trim();
   return s === "" || s === "-" ? null : s;
 };
 
+const num = (v: unknown) => {
+  const s = text(v);
+  if (s === null) return null;
+  const n = Number(s.replace(/,/g, "."));
+  return Number.isFinite(n) ? n : null;
+};
+
+const dateOnly = (v: unknown) => {
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  const s = text(v);
+  if (s === null) return null;
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+};
+
 export async function parseImportFile(file: File): Promise<ParsedImport> {
   const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, { type: "array" });
+  const wb = XLSX.read(buf, { type: "array", cellDates: true });
   const sheetName = wb.SheetNames[0];
   const sheet = sheetName ? wb.Sheets[sheetName] : undefined;
   if (!sheet) throw new Error("File tidak memiliki sheet data.");
@@ -74,24 +115,33 @@ export async function parseImportFile(file: File): Promise<ParsedImport> {
   for (const r of raw) {
     const get = (k: keyof RecordInput) => (map[k] ? r[map[k]!] : null);
     const item_name = text(get("item_name"));
-    const subservice = text(get("subservice"));
     if (!item_name) {
       skipped++;
       continue;
     }
-    const freqRaw = text(get("freq"));
-    const freqNum = freqRaw === null ? null : Number(freqRaw.replace(/,/g, "."));
     rows.push({
       item_name,
       main_service: text(get("main_service")) ?? "-",
-      subservice: subservice ?? "-",
+      subservice: text(get("subservice")) ?? "-",
       status: text(get("status")) ?? "Granted",
       no_simf: text(get("no_simf")),
       site_id: text(get("site_id")),
       station_name: text(get("station_name")),
-      freq: freqNum !== null && Number.isFinite(freqNum) ? freqNum : null,
+      station_address: text(get("station_address")),
+      callsign: text(get("callsign")),
+      freq: num(get("freq")),
+      freq_pair: num(get("freq_pair")),
+      bandwidth: text(get("bandwidth")),
+      antenna_height: num(get("antenna_height")),
+      azimuth: num(get("azimuth")),
+      latitude: num(get("latitude")),
+      longitude: num(get("longitude")),
+      village: text(get("village")),
+      district: text(get("district")),
       city: text(get("city")),
       province: text(get("province")),
+      licence_date: dateOnly(get("licence_date")),
+      validity_date: dateOnly(get("validity_date")),
     });
   }
 
