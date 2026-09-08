@@ -52,6 +52,7 @@ import { RecordFormDialog } from "@/components/records/RecordFormDialog";
 import { ImportDialog } from "@/components/records/ImportDialog";
 import { useAuth, signOut } from "@/hooks/useAuth";
 import {
+  SORT_COLUMNS,
   STATUSES,
   createRecord,
   deleteRecord,
@@ -63,6 +64,7 @@ import {
   type ServiceRecord,
   type SortColumn,
 } from "@/lib/records";
+
 
 const TITLE = "Dashboard Data Izin — Data Izin Frekuensi";
 const DESCRIPTION =
@@ -324,7 +326,33 @@ function Dashboard() {
               </SelectContent>
             </Select>
           </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-sm text-muted-foreground">Urutkan berdasarkan</span>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortColumn)}>
+              <SelectTrigger className="w-64" aria-label="Urutkan berdasarkan kolom">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {SORT_COLUMNS.map((c) => (
+                  <SelectItem key={c.key} value={c.key}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
+              <SelectTrigger className="w-44" aria-label="Arah pengurutan">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">A→Z / terkecil dulu</SelectItem>
+                <SelectItem value="desc">Z→A / terbesar dulu</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </section>
+
 
         <section className="panel overflow-hidden">
           <div className="overflow-x-auto">

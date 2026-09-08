@@ -37,11 +37,56 @@ export type SortColumn =
   | "main_service"
   | "subservice"
   | "status"
+  | "no_simf"
+  | "site_id"
+  | "station_name"
+  | "station_address"
+  | "callsign"
+  | "freq"
+  | "freq_pair"
+  | "bandwidth"
+  | "antenna_height"
+  | "azimuth"
+  | "latitude"
+  | "longitude"
+  | "village"
+  | "district"
   | "city"
   | "province"
-  | "freq"
+  | "licence_date"
   | "validity_date"
+  | "clnt_id"
+  | "appl_id"
   | "last_updated";
+
+export const SORT_COLUMNS: { key: SortColumn; label: string }[] = [
+  { key: "item_name", label: "Nama Klien (CLNT_NAME)" },
+  { key: "main_service", label: "Service" },
+  { key: "subservice", label: "Subservice" },
+  { key: "status", label: "Status (STATUS_SIMF)" },
+  { key: "no_simf", label: "No. SIMF" },
+  { key: "site_id", label: "Site ID" },
+  { key: "station_name", label: "Nama Stasiun (STN_NAME)" },
+  { key: "station_address", label: "Alamat Stasiun" },
+  { key: "callsign", label: "Callsign" },
+  { key: "freq", label: "Frekuensi (FREQ)" },
+  { key: "freq_pair", label: "Frekuensi Pasangan" },
+  { key: "bandwidth", label: "Bandwidth" },
+  { key: "antenna_height", label: "Tinggi Antena" },
+  { key: "azimuth", label: "Azimuth" },
+  { key: "latitude", label: "Latitude" },
+  { key: "longitude", label: "Longitude" },
+  { key: "village", label: "Kelurahan/Desa" },
+  { key: "district", label: "Kecamatan" },
+  { key: "city", label: "Kota/Kabupaten" },
+  { key: "province", label: "Provinsi" },
+  { key: "licence_date", label: "Tanggal Izin" },
+  { key: "validity_date", label: "Masa Berlaku" },
+  { key: "clnt_id", label: "Client ID" },
+  { key: "appl_id", label: "Application ID" },
+  { key: "last_updated", label: "Terakhir diperbarui" },
+];
+
 
 export type RecordsQuery = {
   page: number;
