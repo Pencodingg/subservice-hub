@@ -52,6 +52,7 @@ import { RecordFormDialog } from "@/components/records/RecordFormDialog";
 import { ImportDialog } from "@/components/records/ImportDialog";
 import { useAuth, signOut } from "@/hooks/useAuth";
 import {
+  SORT_COLUMNS,
   STATUSES,
   createRecord,
   deleteRecord,
@@ -63,6 +64,7 @@ import {
   type ServiceRecord,
   type SortColumn,
 } from "@/lib/records";
+
 
 const TITLE = "Dashboard Data Izin — Data Izin Frekuensi";
 const DESCRIPTION =
